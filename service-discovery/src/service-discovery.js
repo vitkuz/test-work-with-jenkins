@@ -1,22 +1,26 @@
 const semver = require('semver');
-const services = {};
+let services = {};
 const timeout = 30000;
 
 function register(ops) {
+  cleanUp();
   const { name, ip, version, port } = ops;
   const key = `${name}-${version}-${ip}-${port}`;
 
   if (!services[key]) {
     services[key] = {
+      key,
       ...ops,
-      createdAt: Date.now()
+      createdAt: Date.now(),
+      updatedAt: Date.now()
     };
     console.log(`Service register successfully`, key);
-    return { key, service: services[key] };
+    return { key, service: services[key], timeout };
   }
 
   console.log(`Service updated successfully`, key);
   services[key] = {
+    key,
     ...services[key],
     ...ops,
     updatedAt: Date.now()
@@ -40,8 +44,14 @@ function deregister(ops) {
 }
 
 function get({name, version}) {
+  cleanUp();
+  let candidates = Object.values(services);
 
-  const candidates = Object.values(services).filter((service) => service.name === name && semver.satisfies(service.version, version));
+  candidates = candidates.filter((service) => {
+    if (service.name === name) {
+      return semver.satisfies(service.version, version);
+    }
+  });
 
   const randomIndex = Math.floor(Math.random() * candidates.length);
 
@@ -49,7 +59,25 @@ function get({name, version}) {
 }
 
 function log() {
-  console.log(services);
+  return services;
+}
+
+function cleanUp() {
+  const currentTime = Date.now();
+
+  let candidates = Object.values(services);
+
+  const stillValid = candidates.filter((service) => {
+    const serviceExpirationTime = service.updatedAt + timeout;
+    return currentTime < serviceExpirationTime;
+  });
+
+  services = stillValid.reduce((acc, service) => {
+    return {
+      ...acc,
+      [service.key]: service
+    }
+  }, {});
 }
 
 module.exports = {

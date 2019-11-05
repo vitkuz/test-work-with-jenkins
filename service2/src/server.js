@@ -7,9 +7,20 @@ const app = express();
 app.use(cors());
 
 const SERVICE_DISCOVERY_URL = 'http://52.87.206.71:3000';
-const SERVICE_NAME = 'users';
+const SERVICE_NAME = 'articles';
 const SERVICE_VERSION = '1.0.0';
-const PORT = 5000;
+const PORT = 4000;
+
+app.get('/users', (req, res) => {
+  res.status(200).json([
+    { name: 'V1' },
+    { name: 'V2' },
+    { name: 'V3' },
+    { name: 'V4' },
+    { name: 'V5' },
+    { name: 'V6' },
+    ])
+});
 
 app.listen(PORT, async () => {
   let interval;
@@ -22,6 +33,9 @@ app.listen(PORT, async () => {
 
   registerService()
     .then((response) => {
+
+      console.log(response.data);
+
       const timeToMakeRequest = response && response.data && response.data.timeout;
       interval = setInterval(registerService, timeToMakeRequest / 3);
     })
@@ -35,6 +49,7 @@ app.listen(PORT, async () => {
     }
     deregisterService();
   };
+
 
   process
     .on('SIGINT', () => {

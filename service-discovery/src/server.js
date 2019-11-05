@@ -7,14 +7,19 @@ const app = express();
 
 app.use(cors());
 
+app.get('/services', (req, res) => {
+
+  const result = ServiceDiscovery.log();
+
+  res.status(200).json(result);
+});
+
 app.get('/service/find/:name/:version', (req, res) => {
     const { name, version } = req.params;
 
     const result = ServiceDiscovery.get({ name, version });
 
-    console.log(result);
-
-    res.json(result)
+    res.status(200).json(result);
 });
 
 app.delete('/service/register/:name/:version/:port', (req, res) => {
@@ -24,7 +29,7 @@ app.delete('/service/register/:name/:version/:port', (req, res) => {
 
     const result = ServiceDiscovery.deregister({ ip, name, version, port });
 
-    res.json(result)
+    res.status(200).json(result);
 });
 
 app.put('/service/register/:name/:version/:port', (req, res) => {
@@ -34,7 +39,31 @@ app.put('/service/register/:name/:version/:port', (req, res) => {
 
     const result = ServiceDiscovery.register({ ip, name, version, port });
 
-    res.json(result)
+    res.status(200).json(result);
 });
 
-app.listen(3000, () => console.log(`Service discovery listens on port 3000`));
+const PORT = process.env.PORT || 3000;
+
+app.listen(3000, () => console.log(`Service discovery listens on port ${PORT}. Proccess pid: ${process.pid}`));
+
+process
+  .on('SIGINT', () => {
+    console.log('Close with SIGINT');
+    cleanup();
+    process.exit(0);
+  })
+  .on('SIGTERM', () => {
+    console.log('Close with SIGTERM');
+    cleanup();
+    process.exit(0);
+  })
+  .on('unhandledRejection', (reason, p) => {
+    console.error(reason, 'Unhandled Rejection at Promise', p);
+    cleanup();
+    process.exit(1);
+  })
+  .on('uncaughtException', (error) => {
+    console.log(`uncaughtException`,error);
+    cleanup();
+    process.exit(1);
+  });
