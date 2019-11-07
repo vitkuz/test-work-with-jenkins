@@ -3,7 +3,8 @@ const dotenv = require('dotenv');
 const result = dotenv.config();
 
 if (result.error) {
-  throw result.error
+  console.log(`Cant find .env file`);
+  console.error(result.error);
 }
 
 console.log(result.parsed);
