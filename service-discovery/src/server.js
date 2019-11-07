@@ -2,68 +2,110 @@ const express = require('express');
 const cors = require('cors');
 
 const ServiceDiscovery = require('./service-discovery');
+const config = require('./config');
 
 const app = express();
 
 app.use(cors());
 
+app.get('/', (req, res) => {
+  res.status(200).json({
+    message: 'Ok',
+    config
+  });
+});
+
 app.get('/services', (req, res) => {
 
-  const result = ServiceDiscovery.log();
+  const result = ServiceDiscovery.all();
 
   res.status(200).json(result);
 });
 
 app.get('/service/find/:name/:version', (req, res) => {
-    const { name, version } = req.params;
+  const {name, version} = req.params;
 
-    const result = ServiceDiscovery.get({ name, version });
+  const result = ServiceDiscovery.get({name, version});
 
-    res.status(200).json(result);
+  res.status(200).json(result);
 });
 
 app.delete('/service/register/:name/:version/:port', (req, res) => {
-    const { name, version, port } = req.params;
+  const {name, version, port} = req.params;
 
-    const ip = req.connection.remoteAddress.includes('::') ?  `[${req.connection.remoteAddress}]` : req.connection.remoteAddress;
+  let ipV6 = null;
+  let ipV4 = null;
 
-    const result = ServiceDiscovery.deregister({ ip, name, version, port });
+  if (isIpV6) {
+    ipV6 = `[${req.connection.remoteAddress}]`;
+    ipV4 = req.connection.remoteAddress.replace('::ffff:', '');
+  } else {
+    ipV4 = req.connection.remoteAddress;
+  }
 
-    res.status(200).json(result);
+  const ip = {
+    ipV6,
+    ipV4
+  };
+
+  const result = ServiceDiscovery.deregister({ip, name, version, port});
+
+  res.status(200).json(result);
 });
 
 app.put('/service/register/:name/:version/:port', (req, res) => {
-    const { name, version, port } = req.params;
+  const {name, version, port} = req.params;
+  let ipV6 = null;
+  let ipV4 = null;
 
-    const ip = req.connection.remoteAddress.includes('::') ?  `[${req.connection.remoteAddress}]` : req.connection.remoteAddress;
+  const isIpV6 = req.connection.remoteAddress.includes('::');
 
-    const result = ServiceDiscovery.register({ ip, name, version, port });
+  if (isIpV6) {
+    ipV6 = `[${req.connection.remoteAddress}]`;
+    ipV4 = req.connection.remoteAddress.replace('::ffff:', '');
+  } else {
+    ipV4 = req.connection.remoteAddress;
+  }
 
-    res.status(200).json(result);
+  const ip = {
+    ipV6,
+    ipV4
+  };
+
+  const result = ServiceDiscovery.register({ip, name, version, port});
+
+  res.status(200).json(result);
 });
 
-const PORT = process.env.PORT || 3000;
+app.get('*', (req, res) => {
+  res.status(404).json({
+    message: 'Page not found'
+  });
+});
 
-app.listen(3000, () => console.log(`Service discovery listens on port ${PORT}. Proccess pid: ${process.pid}`));
+app.listen(config.PORT, () => console.log(`Service discovery listens on port ${config.PORT}. Process pid: ${process.pid}.
+  Config file: 
+    NAME: ${config.NAME}
+    PORT: ${config.PORT}
+    NODE_ENV: ${config.NODE_ENV}
+    MONGO_DB_URL: ${config.MONGO_DB_URL}
+    SECRET: ${config.SECRET}
+`));
 
 process
   .on('SIGINT', () => {
     console.log('Close with SIGINT');
-    cleanup();
     process.exit(0);
   })
   .on('SIGTERM', () => {
     console.log('Close with SIGTERM');
-    cleanup();
     process.exit(0);
   })
   .on('unhandledRejection', (reason, p) => {
     console.error(reason, 'Unhandled Rejection at Promise', p);
-    cleanup();
     process.exit(1);
   })
   .on('uncaughtException', (error) => {
-    console.log(`uncaughtException`,error);
-    cleanup();
+    console.log(`uncaughtException`, error);
     process.exit(1);
   });

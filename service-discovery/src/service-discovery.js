@@ -58,7 +58,7 @@ function get({name, version}) {
   return candidates[randomIndex]
 }
 
-function log() {
+function all() {
   return services;
 }
 
@@ -84,5 +84,5 @@ module.exports = {
   register,
   deregister,
   get,
-  log,
+  all,
 };
