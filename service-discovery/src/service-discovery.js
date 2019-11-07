@@ -5,7 +5,8 @@ const timeout = 30000;
 function register(ops) {
   cleanUp();
   const { name, ip, version, port } = ops;
-  const key = `${name}-${version}-${ip}-${port}`;
+  const { ipV4 } = ip;
+  const key = `${name}-${version}-${ipV4}-${port}`;
 
   if (!services[key]) {
     services[key] = {
@@ -30,7 +31,8 @@ function register(ops) {
 
 function deregister(ops) {
   const { name, ip, version, port } = ops;
-  const key = `${name}-${version}-${ip}-${port}`;
+  const { ipV4 } = ip;
+  const key = `${name}-${version}-${ipV4}-${port}`;
 
   if (services[key]) {
     const deletedService = services[key];

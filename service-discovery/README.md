@@ -1,1 +1,2 @@
-add redis as database
+* add redis as database
+* add logger

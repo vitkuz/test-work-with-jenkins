@@ -6,7 +6,7 @@ const app = express();
 
 app.use(cors());
 
-const SERVICE_DISCOVERY_URL = 'http://52.87.206.71:3000';
+const SERVICE_DISCOVERY_URL = 'http://container-lb-1082559559.us-east-1.elb.amazonaws.com';
 const SERVICE_NAME = 'articles';
 const SERVICE_VERSION = '1.0.0';
 const PORT = 4000;
