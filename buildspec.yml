@@ -21,3 +21,5 @@ phases:
       - echo Pushing the Docker image...
       - docker push $REPOSITORY_URI:latest
       - printf '[{"name":"service-discovery","imageUri":"%s"}]' $REPOSITORY_URI:latest > imagedefinitions.json
+artifacts:
+  files: imagedefinitions.json
