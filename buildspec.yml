@@ -20,3 +20,6 @@ phases:
       - echo Build completed on `date`
       - echo Pushing the Docker image...
       - docker push $REPOSITORY_URI:latest
+      - printf '[{"name":"service-discover:5","imageUri":"%s"}]' $REPOSITORY_URI:latest > imagedefinitions.json
+  artifacts:
+    files: imagedefinitions.json
