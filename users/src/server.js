@@ -2,14 +2,17 @@ const express = require('express');
 const cors = require('cors');
 const axios = require('axios');
 
+const config = require('./config');
+
 const app = express();
 
 app.use(cors());
 
-const SERVICE_DISCOVERY_URL = 'http://container-lb-1082559559.us-east-1.elb.amazonaws.com';
-const SERVICE_NAME = 'articles';
-const SERVICE_VERSION = '1.0.0';
-const PORT = 4000;
+app.get('/', (req, res) => {
+  res.status(200).json({
+    config
+  })
+});
 
 app.get('/users', (req, res) => {
   res.status(200).json([
@@ -22,11 +25,11 @@ app.get('/users', (req, res) => {
     ])
 });
 
-app.listen(PORT, async () => {
+app.listen(config.PORT, async () => {
   let interval;
 
-  const registerUrl = `${SERVICE_DISCOVERY_URL}/service/register/${SERVICE_NAME}/${SERVICE_VERSION}/${PORT}`;
-  const deregisterUrl = `${SERVICE_DISCOVERY_URL}/service/register/${SERVICE_NAME}/${SERVICE_VERSION}/${PORT}`;
+  const registerUrl = `${config.SERVICE_DISCOVERY_URL}/service/register/${config.SERVICE_NAME}/${config.SERVICE_VERSION}/${config.PORT}`;
+  const deregisterUrl = `${config.SERVICE_DISCOVERY_URL}/service/register/${config.SERVICE_NAME}/${config.SERVICE_VERSION}/${config.PORT}`;
 
   const registerService = () => axios.put(registerUrl);
   const deregisterService = () => axios.delete(deregisterUrl);
@@ -40,7 +43,8 @@ app.listen(PORT, async () => {
       interval = setInterval(registerService, timeToMakeRequest / 3);
     })
     .catch(error => {
-      console.log(`Unable to register service on ${registerUrl}`, error);
+      // console.log(`Unable to register service on ${registerUrl}`, error);
+      console.error(`ERROR: Unable to register service on ${registerUrl}`);
     });
 
   const cleanup = () => {
@@ -63,17 +67,19 @@ app.listen(PORT, async () => {
       process.exit(0);
     })
     .on('unhandledRejection', (reason, p) => {
-      console.error(reason, 'Unhandled Rejection at Promise', p);
+      // console.error(reason, 'Unhandled Rejection at Promise', p);
+      console.error('ERROR: Unhandled Rejection at Promise');
       cleanup();
       process.exit(1);
     })
     .on('uncaughtException', (error) => {
-      console.log(error);
+      // console.log(error);
+      console.error('ERROR: uncaughtException');
       cleanup();
       process.exit(1);
     });
 
-  console.log(`Service is running on ${PORT}. Process pid: ${process.pid}`)
+  console.log(`Service is running on ${config.PORT}. Process pid: ${process.pid}`)
 });
 
 

@@ -9,17 +9,17 @@ phases:
       - echo Logging in to Amazon ECR...
       - aws --version
       - $(aws ecr get-login --no-include-email --region $AWS_DEFAULT_REGION)
-      - REPOSITORY_URI=790161600376.dkr.ecr.us-east-1.amazonaws.com/service-discovery
+      - REPOSITORY_URI__SERVICE_DISCOVERY=790161600376.dkr.ecr.us-east-1.amazonaws.com/service-discovery
+      - REPOSITORY_URI__USERS=790161600376.dkr.ecr.us-east-1.amazonaws.com/users
   build:
     commands:
       - echo Build started on `date`
       - echo Building the Docker image...
-      - docker build -t $REPOSITORY_URI:latest ./service-discovery --target prod
+      - docker build -t $REPOSITORY_URI__SERVICE_DISCOVERY:latest ./service-discovery --target prod
+      - docker build -t $REPOSITORY_URI__USERS:latest ./users --target prod
   post_build:
     commands:
       - echo Build completed on `date`
       - echo Pushing the Docker image...
-      - docker push $REPOSITORY_URI:latest
-      - printf '[{"name":"service-discovery","imageUri":"%s"}]' $REPOSITORY_URI:latest > imagedefinitions.json
-artifacts:
-  files: imagedefinitions.json
+      - docker push $REPOSITORY_URI__SERVICE_DISCOVERY:latest
+      - docker push $REPOSITORY_URI__USERS:latest
