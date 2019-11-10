@@ -28,7 +28,7 @@ app.get('/articles', (req, res) => {
     }
   ];
 
-  res.status(200)(articles)
+  res.status(200).json(articles)
 
 });
 
