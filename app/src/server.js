@@ -11,8 +11,13 @@ const app = express();
 
 app.use(cors());
 
-app.get('/', (req, res) => {
-  res.status(200).json({config})
+app.get('/', async (req, res) => {
+
+
+  const users = await services('users');
+  const articles = await services('articles');
+
+  res.status(200).json({ config, users, articles })
 });
 
 app.get('/users', async (req, res) => {

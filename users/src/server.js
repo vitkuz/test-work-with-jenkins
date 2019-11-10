@@ -37,14 +37,20 @@ app.listen(config.PORT, async () => {
   registerService()
     .then((response) => {
 
-      console.log(response.data);
+      console.log(`SUCCESS: Register service on ${registerUrl}`);
 
       const timeToMakeRequest = response && response.data && response.data.timeout;
-      interval = setInterval(registerService, timeToMakeRequest / 3);
+      if (interval) {
+        clearInterval(interval);
+        interval = setInterval(registerService, timeToMakeRequest / 3);
+      }
     })
     .catch(error => {
       // console.log(`Unable to register service on ${registerUrl}`, error);
       console.error(`ERROR: Unable to register service on ${registerUrl}`);
+
+      interval = setInterval(registerService, 60000);
+
     });
 
   const cleanup = () => {
