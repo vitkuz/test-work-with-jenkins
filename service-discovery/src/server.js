@@ -25,7 +25,7 @@ app.get('/services', (req, res) => {
 app.get('/service/find/:name/:version', (req, res) => {
   const {name, version} = req.params;
 
-  const result = ServiceDiscovery.get({name, version});
+  const result = ServiceDiscovery.get({name: name.toLowerCase().trim(), version});
 
   res.status(200).json(result);
 });
@@ -48,7 +48,7 @@ app.delete('/service/register/:name/:version/:port', (req, res) => {
     ipV4
   };
 
-  const result = ServiceDiscovery.deregister({ip, name, version, port});
+  const result = ServiceDiscovery.deregister({ip, name: name.toLowerCase().trim(), version, port});
 
   res.status(200).json(result);
 });
@@ -72,7 +72,7 @@ app.put('/service/register/:name/:version/:port', (req, res) => {
     ipV4
   };
 
-  const result = ServiceDiscovery.register({ip, name, version, port});
+  const result = ServiceDiscovery.register({ip, name: name.toLowerCase().trim(), version, port});
 
   res.status(200).json(result);
 });
