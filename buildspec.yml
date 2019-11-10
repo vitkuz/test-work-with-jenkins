@@ -12,6 +12,7 @@ phases:
       - REPOSITORY_URI__SERVICE_DISCOVERY=790161600376.dkr.ecr.us-east-1.amazonaws.com/service-discovery
       - REPOSITORY_URI__USERS=790161600376.dkr.ecr.us-east-1.amazonaws.com/users
       - REPOSITORY_URI__ARTICLES=790161600376.dkr.ecr.us-east-1.amazonaws.com/articles
+      - REPOSITORY_URI__APP=790161600376.dkr.ecr.us-east-1.amazonaws.com/app
   build:
     commands:
       - echo Build started on `date`
@@ -19,6 +20,7 @@ phases:
       - docker build -t $REPOSITORY_URI__SERVICE_DISCOVERY:latest ./service-discovery --target prod
       - docker build -t $REPOSITORY_URI__USERS:latest ./users --target prod
       - docker build -t $REPOSITORY_URI__ARTICLES:latest ./articles --target prod
+      - docker build -t $REPOSITORY_URI__APP:latest ./app --target prod
   post_build:
     commands:
       - echo Build completed on `date`
@@ -26,3 +28,4 @@ phases:
       - docker push $REPOSITORY_URI__SERVICE_DISCOVERY:latest
       - docker push $REPOSITORY_URI__USERS:latest
       - docker push $REPOSITORY_URI__ARTICLES:latest
+      - docker push $REPOSITORY_URI__APP:latest

@@ -5,7 +5,7 @@ const axios = require('axios');
 const config = require('./config');
 const services = require('./services');
 const UserService = require('./users.service');
-const ArticleService = require('./users.service');
+const ArticleService = require('./articles.service');
 
 const app = express();
 
