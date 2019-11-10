@@ -1,6 +1,6 @@
 FROM node:alpine as base
 ENV NODE_ENV=production
-ENV PORT=3000
+ENV PORT=6000
 WORKDIR /app
 
 COPY ./package*.json ./
