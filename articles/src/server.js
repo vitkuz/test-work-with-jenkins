@@ -9,10 +9,10 @@ const app = express();
 app.use(cors());
 
 app.get('/', (req, res) => {
-  res.json(config)
+  res.status(200).json({config})
 });
 
-app.get('/articles', () => {
+app.get('/articles', (req, res) => {
   const articles = [
     {
       title: 'title 1',
@@ -28,7 +28,7 @@ app.get('/articles', () => {
     }
   ];
 
-  res.json(articles)
+  res.status(200)(articles)
 
 });
 
